@@ -25,6 +25,7 @@
 #if HAS_PID_HEATING
 
 #include "../gcode.h"
+#include "../queue.h" // for flush_tx
 #include "../../lcd/marlinui.h"
 #include "../../module/temperature.h"
 
@@ -72,14 +73,18 @@ void GcodeSuite::M303() {
       return;
   }
 
-  const bool seenC = parser.seenval('C');
-  const int c = seenC ? parser.value_int() : 5;
+  const int cycles = parser.intval('C', 5);
+  if (cycles < 3) {
+    SERIAL_ECHOLNPGM("?(C)ycles not plausible (>=3).");
+    return;
+  }
+
   const bool seenS = parser.seenval('S');
   const celsius_t temp = seenS ? parser.value_celsius() : default_temp;
-  const bool u = parser.boolval('U');
+  const bool uflag = parser.boolval('U');
 
-  #if ENABLED(DWIN_LCD_PROUI) && EITHER(PIDTEMP, PIDTEMPBED)
-    if (seenC) HMI_data.PidCycles = c;
+  #if ENABLED(DWIN_LCD_PROUI) && ANY(PIDTEMP, PIDTEMPBED)
+    HMI_data.PidCycles = cycles;
     if (seenS) {
       switch (hid) {
         OPTCODE(PIDTEMP,    case 0 ... HOTENDS - 1: HMI_data.HotendPidT = temp; break)
@@ -89,13 +94,13 @@ void GcodeSuite::M303() {
     }
   #endif
 
-  #if DISABLED(BUSY_WHILE_HEATING)
-    KEEPALIVE_STATE(NOT_BUSY);
-  #endif
+  IF_DISABLED(BUSY_WHILE_HEATING, KEEPALIVE_STATE(NOT_BUSY));
 
   LCD_MESSAGE(MSG_PID_AUTOTUNE);
-  thermalManager.PID_autotune(temp, hid, c, u);
+  thermalManager.PID_autotune(temp, hid, cycles, uflag);
   ui.reset_status();
+
+  queue.flush_rx();
 }
 
 #endif // HAS_PID_HEATING
