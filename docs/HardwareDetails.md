@@ -25,6 +25,7 @@ These values were altered to fit the printer in the marlin configuration files.
 | Z travel limit | `Z_MAX_POS` | `250 mm` | Maximum Z coordinate after homing |
 | Motion calibration | `DEFAULT_AXIS_STEPS_PER_UNIT` | `{80, 80, 400, 138.81}` | X, Y, Z, and E steps/mm; E is calibrated for the direct-drive extruder |
 | Motion tuning | `DEFAULT_MAX_ACCELERATION` | `{3000, 3000, 100, 5000}` | X, Y, Z, and E maximum acceleration in mm/s^2 |
+| Motion tuning | `S_CURVE_ACCELERATION` | Enabled | Enables S-curve acceleration |
 | Motor direction | `INVERT_X_DIR` | `true` | X-axis direction |
 | Motor direction | `INVERT_Y_DIR` | `true` | Y-axis direction |
 | Motor direction | `INVERT_Z_DIR` | `false` | Z-axis direction |
@@ -37,17 +38,22 @@ These values were altered to fit the printer in the marlin configuration files.
 | Bed leveling | `GRID_MAX_POINTS_X` | `10` | Number of UBL mesh points along X |
 | Bed leveling | `GRID_MAX_POINTS_Y` | `GRID_MAX_POINTS_X` (`10`) | Number of UBL mesh points along Y |
 | Bed leveling | `MESH_INSET` | `5 mm` | Inset from the bed edges for UBL mesh bounds |
+| Bed leveling | `G26_MESH_VALIDATION` | Enabled | Enables the G26 mesh validation pattern |
 | Probing | `PROBING_MARGIN` | `2.5 mm` | Margin applied to probe reachability |
 | Temperature sensor | `TEMP_SENSOR_0` | `1` | 100k EPCOS hotend thermistor |
 | Temperature sensor | `TEMP_SENSOR_BED` | `1` | 100k EPCOS bed thermistor |
 | Temperature limit | `HEATER_0_MAXTEMP` | `275 C` | Maximum configured hotend temperature |
 | Temperature limit | `BED_MAXTEMP` | `125 C` | Maximum configured bed temperature |
+| Hotend PID | `DEFAULT_KP` | `23.5` | Proportional term |
+| Hotend PID | `DEFAULT_KI` | `3.11` | Integral term |
+| Hotend PID | `DEFAULT_KD` | `48.81` | Derivative term |
 | Filament runout | `FILAMENT_RUNOUT_SENSOR` | Enabled | Enables filament runout sensing |
 | Filament runout | `NUM_RUNOUT_SENSORS` | `1` | One runout sensor |
 | Filament runout | `FILAMENT_RUNOUT_SCRIPT` | `M600` | Runs the filament-change command on runout |
 | Filament runout | `FILAMENT_RUNOUT_DISTANCE_MM` | `10 mm` | Continues this filament distance before running the script; enables motion-sensor mode |
 | Display | `CR10_STOCKDISPLAY` | Enabled | Retains the stock CR-10 display |
 | Storage | `SDSUPPORT` | Enabled | Enables SD-card support |
+| Storage | `SDCARD_READONLY` | Disabled | SD-card write access is not disabled |
 | Settings storage | `EEPROM_SETTINGS` | Enabled | Saves and restores settings with `M500` / `M501` |
 
 ### `Configuration_adv.h`
@@ -63,7 +69,7 @@ These values were altered to fit the printer in the marlin configuration files.
 | Chopper timing | `CHOPPER_TIMING` | `CHOPPER_DEFAULT_24V` | 24V timing preset selected for all axes |
 | Linear Advance | `LIN_ADVANCE` | Enabled | Enables Linear Advance |
 | Linear Advance | `ADVANCE_K` | `0.05` | Pressure advance value for the direct-drive extruder |
-| S-curve motion | `EXPERIMENTAL_SCURVE` | Enabled | Allows S-curve acceleration with Linear Advance |
+| G-code support | `ARC_SUPPORT` | Disabled | Arc commands are not used |
 | Babystepping | `BABYSTEPPING` | Enabled | Enables babystepping |
 | Babystepping | `BABYSTEP_ALWAYS_AVAILABLE` | Disabled | Babystepping is not enabled outside active movement |
 | Filament change | `ADVANCED_PAUSE_FEATURE` | Enabled | Provides `M600` support for the runout script |
@@ -74,6 +80,7 @@ These values were altered to fit the printer in the marlin configuration files.
 | Serial buffer | `TX_BUFFER_SIZE` | `4` | Transmission buffer size |
 | SD print behavior | `SD_FINISHED_STEPPERRELEASE` | `true` | Releases steppers after an SD print |
 | SD print behavior | `EVENT_GCODE_SD_ABORT` | `G28XY` | Homes X/Y when an SD print is aborted |
+| Firmware transfer | `BINARY_FILE_TRANSFER` | Enabled | Enables optimized binary file transfer with `M28 B1` |
 
 ### `Version.h`
 
@@ -81,12 +88,23 @@ These values were altered to fit the printer in the marlin configuration files.
 
 | Area | Setting | Value | Printer-specific detail |
 | --- | --- | --- | --- |
-| Firmware version | `SHORT_BUILD_VERSION` | `2.1.2.1` | Marlin release version string |
+| Firmware version | `SHORT_BUILD_VERSION` | `2.1.2.9` | Marlin release version string |
 | Firmware version | `DETAILED_BUILD_VERSION` | `SHORT_BUILD_VERSION` | Uses the short version as the detailed version |
-| Build metadata | `STRING_DISTRIBUTION_DATE` | `2024-01-22` | Distribution date reported by the firmware |
+| Build metadata | `STRING_DISTRIBUTION_DATE` | `2026-11-17` | Distribution date reported by the firmware |
 | Printer identity | `MACHINE_NAME` | `Ender-3 (SKR Mini E3 v1.2)` | Printer name supplied by `Version.h` |
 | Source location | `SOURCE_CODE_URL` | `https://github.com/TerawattX/Marlin` | URL reported as the firmware source |
 | Printer identity | `DEFAULT_MACHINE_UUID` | `a5520f0c-e436-4dd5-b2a2-6807c010c552` | Default printer UUID; `MACHINE_UUID` in `Configuration.h` is set to the same value |
+
+### Configuration changes
+
+#### 2026-11-17
+
+- Removed the obsolete `EXPERIMENTAL_SCURVE` setting; `S_CURVE_ACCELERATION` is enabled in `Configuration.h`.
+- Disabled `ARC_SUPPORT` because arc commands were not being used.
+- Enabled `BINARY_FILE_TRANSFER` to support firmware transfer using `M28 B1`.
+- Enabled `G26_MESH_VALIDATION` and disabled `SDCARD_READONLY`.
+- Updated the PID setting names to the current Marlin spelling (`DEFAULT_KP`, `DEFAULT_KI`, and `DEFAULT_KD`); the configured PID values are unchanged.
+- Updated the documented firmware version and distribution date from `Version.h`.
 
 ## Hardware Upgrades
 
