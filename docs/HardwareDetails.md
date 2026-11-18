@@ -37,9 +37,9 @@ These values were altered to fit the printer in the marlin configuration files.
 | Bed leveling | `AUTO_BED_LEVELING_UBL` | Enabled | Unified Bed Leveling |
 | Bed leveling | `GRID_MAX_POINTS_X` | `10` | Number of UBL mesh points along X |
 | Bed leveling | `GRID_MAX_POINTS_Y` | `GRID_MAX_POINTS_X` (`10`) | Number of UBL mesh points along Y |
-| Bed leveling | `MESH_INSET` | `5 mm` | Inset from the bed edges for UBL mesh bounds |
+| Bed leveling | `MESH_INSET` | `10 mm` | Inset from the bed edges for UBL mesh bounds |
 | Bed leveling | `G26_MESH_VALIDATION` | Enabled | Enables the G26 mesh validation pattern |
-| Probing | `PROBING_MARGIN` | `2.5 mm` | Margin applied to probe reachability |
+| Probing | `PROBING_MARGIN` | `MESH_INSET` (`10 mm`) | Matches the mesh inset to keep probing away from the bed edges |
 | Temperature sensor | `TEMP_SENSOR_0` | `1` | 100k EPCOS hotend thermistor |
 | Temperature sensor | `TEMP_SENSOR_BED` | `1` | 100k EPCOS bed thermistor |
 | Temperature limit | `HEATER_0_MAXTEMP` | `275 C` | Maximum configured hotend temperature |
@@ -81,6 +81,7 @@ These values were altered to fit the printer in the marlin configuration files.
 | SD print behavior | `SD_FINISHED_STEPPERRELEASE` | `true` | Releases steppers after an SD print |
 | SD print behavior | `EVENT_GCODE_SD_ABORT` | `G28XY` | Homes X/Y when an SD print is aborted |
 | Firmware transfer | `BINARY_FILE_TRANSFER` | Enabled | Enables optimized binary file transfer with `M28 B1` |
+| Bed leveling | `MESH_MIN_X`, `MESH_MIN_Y`, `MESH_MAX_X`, `MESH_MAX_Y` | Commented out | Uses the inset-derived mesh bounds instead of coordinate overrides |
 
 ### `Version.h`
 
@@ -90,7 +91,7 @@ These values were altered to fit the printer in the marlin configuration files.
 | --- | --- | --- | --- |
 | Firmware version | `SHORT_BUILD_VERSION` | `2.1.2.9` | Marlin release version string |
 | Firmware version | `DETAILED_BUILD_VERSION` | `SHORT_BUILD_VERSION` | Uses the short version as the detailed version |
-| Build metadata | `STRING_DISTRIBUTION_DATE` | `2026-11-17` | Distribution date reported by the firmware |
+| Build metadata | `STRING_DISTRIBUTION_DATE` | `2026-11-18` | Distribution date reported by the firmware |
 | Printer identity | `MACHINE_NAME` | `Ender-3 (SKR Mini E3 v1.2)` | Printer name supplied by `Version.h` |
 | Source location | `SOURCE_CODE_URL` | `https://github.com/TerawattX/Marlin` | URL reported as the firmware source |
 | Printer identity | `DEFAULT_MACHINE_UUID` | `a5520f0c-e436-4dd5-b2a2-6807c010c552` | Default printer UUID; `MACHINE_UUID` in `Configuration.h` is set to the same value |
@@ -105,6 +106,13 @@ These values were altered to fit the printer in the marlin configuration files.
 - Enabled `G26_MESH_VALIDATION` and disabled `SDCARD_READONLY`.
 - Updated the PID setting names to the current Marlin spelling (`DEFAULT_KP`, `DEFAULT_KI`, and `DEFAULT_KD`); the configured PID values are unchanged.
 - Updated the documented firmware version and distribution date from `Version.h`.
+
+#### 2026-11-18
+
+- Increased `MESH_INSET` to `10 mm` and set `PROBING_MARGIN` to `MESH_INSET`.
+- Commented out the `MESH_MIN_X`, `MESH_MIN_Y`, `MESH_MAX_X`, and `MESH_MAX_Y` overrides so the inset defines the mesh bounds.
+- Moved the mesh inward to avoid skipping probing column 0 (`X=0`) and to keep the probe on the bed at row 0 (`Y=0`).
+- Updated the documented distribution date to `2026-11-18`.
 
 ## Hardware Upgrades
 
